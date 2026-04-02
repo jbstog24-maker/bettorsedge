@@ -89,6 +89,8 @@ class ApiSportsBasketballService {
     game?: number | string;
     bookmaker?: number | string;
     bet?: number | string;
+    page?: number;
+    limit?: number;
   }): Promise<NormalizedOddsResponse[]> {
     const cacheKey = JSON.stringify(filters);
     const cached = this.oddsCache.get(cacheKey);
