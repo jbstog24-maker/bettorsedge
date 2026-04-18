@@ -1408,12 +1408,9 @@ RULES:
         }));
       }
 
-      // Use verified API-Sports injuries first, then fall back only if needed
+      // Use verified API-Sports injuries as the source of truth; do not restore stale unverified injuries
       if (Array.isArray(game.apiSportsVerifiedInjuries) && game.apiSportsVerifiedInjuries.length > 0) {
         prediction.injuries = game.apiSportsVerifiedInjuries;
-      } else if (existingPrediction && Array.isArray(existingPrediction.injuries) && existingPrediction.injuries.length > 0) {
-        console.log("[Gemini] No API-Sports injuries found, restoring existingPrediction injuries");
-        prediction.injuries = existingPrediction.injuries;
       } else if (!Array.isArray(prediction.injuries)) {
         prediction.injuries = [];
       }
@@ -1660,6 +1657,16 @@ RULES:
           { category: 'Record', homeValue: game.homeTeamStats?.record || 'N/A', awayValue: game.awayTeamStats?.record || 'N/A', advantage: 'neutral' },
           { category: 'Projected Goals', homeValue: prediction.scorePrediction?.home ?? 'N/A', awayValue: prediction.scorePrediction?.away ?? 'N/A', advantage: higherIsBetter(prediction.scorePrediction?.home, prediction.scorePrediction?.away) },
           { category: 'Total Goal Environment', homeValue: prediction.projectedTotal ?? 'N/A', awayValue: prediction.projectedTotal ?? 'N/A', advantage: 'neutral' },
+          { category: 'Recent Form', homeValue: game.homeTeamStats?.last5 || 'N/A', awayValue: game.awayTeamStats?.last5 || 'N/A', advantage: 'neutral' },
+          { category: 'Win %', homeValue: game.homeTeamStats?.winPercentage || 'N/A', awayValue: game.awayTeamStats?.winPercentage || 'N/A', advantage: 'neutral' }
+        ];
+      }
+
+      if ((!Array.isArray(prediction.teamStatsComparison) || prediction.teamStatsComparison.length < 4) && game.league === 'NFL') {
+        prediction.teamStatsComparison = [
+          { category: 'Record', homeValue: game.homeTeamStats?.record || 'N/A', awayValue: game.awayTeamStats?.record || 'N/A', advantage: 'neutral' },
+          { category: 'Projected Points', homeValue: prediction.scorePrediction?.home ?? 'N/A', awayValue: prediction.scorePrediction?.away ?? 'N/A', advantage: higherIsBetter(prediction.scorePrediction?.home, prediction.scorePrediction?.away) },
+          { category: 'Total Point Environment', homeValue: prediction.projectedTotal ?? 'N/A', awayValue: prediction.projectedTotal ?? 'N/A', advantage: 'neutral' },
           { category: 'Recent Form', homeValue: game.homeTeamStats?.last5 || 'N/A', awayValue: game.awayTeamStats?.last5 || 'N/A', advantage: 'neutral' },
           { category: 'Win %', homeValue: game.homeTeamStats?.winPercentage || 'N/A', awayValue: game.awayTeamStats?.winPercentage || 'N/A', advantage: 'neutral' }
         ];
@@ -2451,6 +2458,9 @@ CRITICAL: You MUST use your search tool to confirm every player's current team. 
 }
 
 export const bettorsEdge = new BettorsEdge();
+
+
+
 
 
 

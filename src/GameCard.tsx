@@ -206,7 +206,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       className={cn(
       "bg-slate-900 border rounded-xl overflow-hidden transition-all duration-300 shadow-lg group relative",
       isAnalyzing 
-        ? "border-indigo-500 shadow-indigo-500/20 ring-1 ring-indigo-500/50" 
+        ? "border-indigo-400 shadow-indigo-500/30 ring-2 ring-indigo-500/60 bg-indigo-500/5" 
         : "border-slate-800 hover:border-indigo-500/50 hover:shadow-indigo-500/10"
     )}>
       {isAnalyzing && (
@@ -925,7 +925,7 @@ export const GameCard: React.FC<GameCardProps> = ({
                 )}
 
                 {/* Injury Report */}
-                {(prediction && (Array.isArray(prediction.injuries) || prediction.qaStatus || prediction.qaNotes)) && (
+                {prediction && (
                   <div id="injury-report" className="bg-rose-500/5 border border-rose-500/10 rounded-xl p-5 shadow-sm mb-4">
                     <h4 className="text-xs font-black text-rose-400 uppercase tracking-widest mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -1399,6 +1399,8 @@ export const GameCard: React.FC<GameCardProps> = ({
     </div>
   );
 };
+
+
 
 
 
