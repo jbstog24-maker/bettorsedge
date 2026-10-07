@@ -258,12 +258,14 @@ export function LandingPage({ initialError, onEnter, onBackHome, appMode = false
             </div>
           </button>
 
-          <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="#how-it-works" className="hover:text-white">How it works</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="#faq" className="hover:text-white">FAQ</a>
-          </nav>
+          {!appMode && (
+            <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+              <a href="#features" className="hover:text-white">Features</a>
+              <a href="#how-it-works" className="hover:text-white">How it works</a>
+              <a href="#pricing" className="hover:text-white">Pricing</a>
+              <a href="#faq" className="hover:text-white">FAQ</a>
+            </nav>
+          )}
 
           <button
             type="button"
@@ -299,13 +301,15 @@ export function LandingPage({ initialError, onEnter, onBackHome, appMode = false
                 Launch Bettors Edge
                 <ArrowRight className="ml-2 h-5 w-5 transition group-hover:translate-x-1" />
               </button>
-              <a
-                href="#how-it-works"
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/70 px-6 py-4 text-base font-bold text-slate-200 transition hover:bg-slate-800"
-              >
-                See How It Works
-                <ChevronDown className="ml-2 h-5 w-5" />
-              </a>
+              {!appMode && (
+                <a
+                  href="#how-it-works"
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/70 px-6 py-4 text-base font-bold text-slate-200 transition hover:bg-slate-800"
+                >
+                  See How It Works
+                  <ChevronDown className="ml-2 h-5 w-5" />
+                </a>
+              )}
             </div>
 
             <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3 text-left">
