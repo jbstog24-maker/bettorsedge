@@ -986,7 +986,7 @@ export class BettorsEdge {
     const analysisGame = await this.enrichMlbGame(game, date);
     const edgeModel = this.calculateEdgeModel(analysisGame);
     const mlbCtxRaw = (analysisGame as any).mlbContext;
-    const predictedHome = edgeModel.modelProbability >= 0.5;
+    const predictedHome = edgeModel.selectedSide === "home";
     const predictedWinner = predictedHome ? analysisGame.homeTeam : analysisGame.awayTeam;
     const winner = edgeModel.recommendation === "NO_PLAY" ? "PASS" : predictedWinner;
 

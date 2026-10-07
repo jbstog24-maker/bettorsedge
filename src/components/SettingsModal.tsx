@@ -97,8 +97,10 @@ export function SettingsModal({
   const handleDisconnectOpenAI = () => {
     setIsOpenAIConnected(false);
     setOpenaiKey("");
+    setUseOpenAI(false);
     localStorage.removeItem("openai_api_key");
     localStorage.removeItem("openai_model");
+    localStorage.removeItem("use_openai");
     window.location.reload();
   };
 

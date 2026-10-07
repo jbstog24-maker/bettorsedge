@@ -98,7 +98,7 @@ export const AccuracyTab: React.FC<AccuracyTabProps> = ({ predictions, onSyncPen
   }, [resolvedPredictions, filterLeague, filterType, filterTime, minConfidence]);
 
   useEffect(() => {
-    console.log("[AccuracyTab] Mounted with predictions:", predictions.length);
+    console.log("[AccuracyTab] Mounted with predictions:", Object.keys(predictions).length);
   }, []);
 
   useEffect(() => {

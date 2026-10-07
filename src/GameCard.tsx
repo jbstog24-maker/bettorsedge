@@ -29,8 +29,6 @@ import { cn } from "./lib/utils";
 import { ApiSportsWidgetEmbed } from "./components/ApiSportsWidgets";
 import { MlbMatchupLab } from "./components/MlbMatchupLab";
 
-const WIDGET_KEY = import.meta.env.VITE_API_SPORTS_WIDGET_KEY || "b2795a8c744b26f971aaf15eb994212e";
-
 interface GameCardProps {
   game: Game;
   prediction?: Prediction | null;

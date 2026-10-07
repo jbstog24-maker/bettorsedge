@@ -106,6 +106,20 @@ const normalizeLeagueKey = (value: unknown, fallback = "") => {
   return fallback.toUpperCase();
 };
 
+// Parses a game's `time` field ("h:mm AM/PM") into a 24-hour hour.
+// Mirrors the convention used by getFilteredGames. Returns null when unknown.
+const getGameHour = (game: { time?: string }): number | null => {
+  const timeStr = game.time;
+  if (!timeStr || timeStr === "TBD") return null;
+  const isPM = timeStr.includes("PM");
+  const [hourStr] = timeStr.replace(/ AM| PM/g, "").split(":");
+  let hour = parseInt(hourStr, 10);
+  if (Number.isNaN(hour)) return null;
+  if (isPM && hour !== 12) hour += 12;
+  if (!isPM && hour === 12) hour = 0;
+  return hour;
+};
+
 
 
 
@@ -152,7 +166,7 @@ export function Dashboard({
     if (!user) return;
     
     // Safety check for stale walkthrough
-    const stored = localStorage.getItem("has_seen_walkthrough");
+    const stored = localStorage.getItem("hasSeenWalkthrough");
     if (stored === "true") {
       setRunWalkthrough(false);
     }
@@ -932,7 +946,10 @@ export function Dashboard({
         const thirtyMinsFromNow = new Date(now.getTime() + 30 * 60 * 1000);
         
         for (const game of games) {
-          const gameTime = new Date(game.date);
+          // Build the start time from date + time (game.date alone is midnight)
+          const hour = getGameHour(game);
+          if (hour === null) continue;
+          const gameTime = new Date(`${game.date}T${String(hour).padStart(2, "0")}:00:00`);
           
           if (gameTime > now && gameTime <= thirtyMinsFromNow && !alertedGames.has(game.id)) {
             console.log(`[Alert] Game ${game.id} is starting in 30 mins. Checking for changes...`);
@@ -1580,9 +1597,10 @@ export function Dashboard({
     setLoading(true);
     
     try {
-      setToast({ message: `Importing ${activeTab} schedule for next 7 days...`, type: "info" });
+      const importLeague = selectedSport === "ALL" ? "NBA" : selectedSport;
+      setToast({ message: `Importing ${importLeague} schedule for next 7 days...`, type: "info" });
       
-      await bettorsEdge.importSchedule(activeTab, getNYDate(), 7, (msg) => {
+      await bettorsEdge.importSchedule(importLeague, getNYDate(), 7, (msg) => {
         setToast({ message: msg, type: "info" });
       }, true);
       
@@ -1839,7 +1857,7 @@ export function Dashboard({
       return;
     }
     
-    const targetLeague = leagueOverride || activeTab;
+    const targetLeague = leagueOverride || (activeTab === "Dashboard" || activeTab === "Picks" ? selectedSport : activeTab);
     const isTargetAnalyzing = analyzingMap[targetLeague] || false;
 
     console.log("Analyze triggered", { user, analyzing: isTargetAnalyzing, loading, force, targetLeague, silent });
@@ -1860,6 +1878,7 @@ export function Dashboard({
       ? filteredGames.filter(g => selectedGameIds.has(g.id))
       : games.filter(g => {
           if (!g.league) return false;
+          if (targetLeague === "ALL") return true;
           const gLeague = normalizeLeagueKey(g.league, targetLeague);
           const tLeague = normalizeLeagueKey(targetLeague);
           return gLeague === tLeague || gLeague.includes(tLeague) || tLeague.includes(gLeague);
@@ -1890,7 +1909,7 @@ export function Dashboard({
         injuryUpdates = await bettorsEdge.checkInjuryUpdates(
           targetLeague, 
           dateStr, 
-          gamesToConsider.filter(g => g.league === targetLeague), 
+          gamesToConsider.filter(g => targetLeague === "ALL" || g.league === targetLeague), 
           () => cancelAnalysisRef.current[targetLeague],
           (current, total) => {
             setAnalysisProgressMap(prev => {
@@ -1948,12 +1967,13 @@ export function Dashboard({
       if (!silent) setToast({ message: `Starting analysis for ${targetLeague} on ${dateStr}...`, type: "info" });
 
       const gamesToAnalyze = gamesToConsider.filter(game => {
-        // Strict league check
-        if (game.league !== targetLeague) return false;
+        // Strict league check (skipped when analyzing ALL sports)
+        if (targetLeague !== "ALL" && game.league !== targetLeague) return false;
 
-        // Time filter check
+        // Time filter check (parsed from game.time, same convention as getFilteredGames)
         if (timeFilter !== "all") {
-          const hour = new Date(game.date).getHours();
+          const hour = getGameHour(game);
+          if (hour === null) return false;
           if (timeFilter === "early" && hour >= 16) return false;
           if (timeFilter === "afternoon" && (hour < 16 || hour >= 19)) return false;
           if (timeFilter === "late" && hour < 19) return false;
@@ -2443,9 +2463,10 @@ export function Dashboard({
 
   const handleStopAnalysis = () => {
     console.log("[Dashboard] Stopping analysis/injury check...");
-    cancelAnalysisRef.current[activeTab] = true;
-    setAnalyzingMap(prev => ({ ...prev, [activeTab]: false }));
-    setAnalysisProgressMap(prev => ({ ...prev, [activeTab]: null }));
+    const stopKey = activeTab === "Dashboard" || activeTab === "Picks" ? selectedSport : activeTab;
+    cancelAnalysisRef.current[stopKey] = true;
+    setAnalyzingMap(prev => ({ ...prev, [stopKey]: false }));
+    setAnalysisProgressMap(prev => ({ ...prev, [stopKey]: null }));
     setToast({ message: "Stopping process...", type: "info" });
   };
 

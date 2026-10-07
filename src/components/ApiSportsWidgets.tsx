@@ -408,7 +408,7 @@ export function NbaApiSportsPanel({
       default:
         return apiSportsGamesWidgetHtml;
     }
-  }, [activeWidgetTab, selectedDate]);
+  }, [activeWidgetTab, selectedDate, selectedGameId, selectedH2H]);
 
   return (
     <section className="mb-8 rounded-3xl border border-slate-800 bg-slate-900/70 p-4 md:p-6">

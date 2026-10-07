@@ -78,9 +78,9 @@ export const TournamentTracker: React.FC<TournamentTrackerProps> = ({ bracket })
           </div>
           <span className="text-xs font-mono text-slate-500 uppercase tracking-wider">Next High Stakes</span>
         </div>
-        {bracket.rounds.find(r => r.games.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled') ? (
+        {bracket.rounds.find(r => r.games?.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled') ? (
           <div className="text-sm font-bold text-white truncate">
-            {bracket.rounds.find(r => r.games.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled')?.awayTeam} @ {bracket.rounds.find(r => r.games.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled')?.homeTeam}
+            {bracket.rounds.find(r => r.games?.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled')?.awayTeam} @ {bracket.rounds.find(r => r.games?.some(g => g.status === 'scheduled'))?.games.find(g => g.status === 'scheduled')?.homeTeam}
           </div>
         ) : (
           <div className="text-sm font-bold text-slate-500">No scheduled games</div>

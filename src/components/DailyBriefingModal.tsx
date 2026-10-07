@@ -19,6 +19,10 @@ export function DailyBriefingModal({ isOpen, onClose, league, date, games }: Dai
   const [healthCheck, setHealthCheck] = useState<{ status: string, details: string, latestDate?: string } | null>(null);
   const [checkingHealth, setCheckingHealth] = useState(false);
 
+  // Stable scalar: regenerates the briefing once games finish loading after open,
+  // without refiring on every games array identity change.
+  const gameCount = games.length;
+
   useEffect(() => {
     if (isOpen) {
       generateReport().catch(console.error);
@@ -31,7 +35,7 @@ export function DailyBriefingModal({ isOpen, onClose, league, date, games }: Dai
       setError(null);
       setHealthCheck(null);
     }
-  }, [isOpen, league, date]);
+  }, [isOpen, league, date, gameCount]);
 
   const runHealthCheck = async () => {
     setCheckingHealth(true);
